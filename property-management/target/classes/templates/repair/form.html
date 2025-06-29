@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header(${repair.id ? '维修详情' : '提交维修申请'})">
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/repairs}">维修管理</a></li>
+            <li class="breadcrumb-item active" aria-current="page" th:text="${repair.id ? '维修详情' : '提交申请'}"></li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title" th:text="${repair.id ? repair.title : '提交维修申请'}"></h2>
+
+                    <div th:if="${repair.id}">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span th:class="${repair.status == 'PENDING'} ? 'badge bg-secondary' :
+                                     ${repair.status == 'PROCESSING'} ? 'badge bg-primary' : 'badge bg-success'"
+                                  th:text="${repair.status}"></span>
+                            <small class="text-muted">
+                                提交于 <span th:text="${#temporals.format(repair.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                            </small>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5>问题描述</h5>
+                            <p th:text="${repair.description}"></p>
+                        </div>
+
+                        <div th:if="${repair.staffNotes}" class="mb-4">
+                            <h5>处理备注</h5>
+                            <p th:text="${repair.staffNotes}"></p>
+                        </div>
+
+                        <div th:if="${repair.completedAt}" class="text-muted small">
+                            完成于 <span th:text="${#temporals.format(repair.completedAt, 'yyyy-MM-dd HH:mm')}"></span>
+                        </div>
+                    </div>
+
+                    <form th:if="${!repair.id}" th:action="@{/repairs}" method="post">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">标题</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">详细描述</label>
+                            <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">提交申请</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${repair.id}" class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">维修信息</h5>
+                    <div class="mb-3">
+                        <p><strong>住户:</strong> <span th:text="${repair.resident.name + ' (' + repair.resident.roomNumber + ')'}"></span></p>
+                    </div>
+
+                    <div sec:authorize="hasRole('ADMIN')" class="mt-4">
+                        <button class="btn btn-outline-primary w-100 mb-2"
+                                data-bs-toggle="modal"
+                                data-bs-target="#updateRepairStatusModal">
+                            <i class="bi bi-arrow-repeat"></i> 更新状态
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

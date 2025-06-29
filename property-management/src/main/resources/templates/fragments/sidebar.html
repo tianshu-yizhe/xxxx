@@ -1,0 +1,36 @@
+<div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" id="sidebarMenu">
+    <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/dashboard}" th:classappend="${#httpServletRequest.requestURI == '/dashboard'} ? 'active'">
+                    <i class="bi bi-speedometer2 me-2"></i>仪表盘
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/facilities}" th:classappend="${#httpServletRequest.requestURI == '/facilities'} ? 'active'">
+                    <i class="bi bi-building me-2"></i>公共设施
+                </a>
+            </li>
+            <li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'RESIDENT')">
+                <a class="nav-link" th:href="@{/fees}" th:classappend="${#httpServletRequest.requestURI == '/fees'} ? 'active'">
+                    <i class="bi bi-cash-coin me-2"></i>费用管理
+                </a>
+            </li>
+            <li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'RESIDENT')">
+                <a class="nav-link" th:href="@{/repairs}" th:classappend="${#httpServletRequest.requestURI == '/repairs'} ? 'active'">
+                    <i class="bi bi-tools me-2"></i>维修管理
+                </a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" th:href="@{/residents}" th:classappend="${#httpServletRequest.requestURI == '/residents'} ? 'active'">
+                    <i class="bi bi-people me-2"></i>住户管理
+                </a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" th:href="@{/users}" th:classappend="${#httpServletRequest.requestURI == '/users'} ? 'active'">
+                    <i class="bi bi-person-lines-fill me-2"></i>用户管理
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/header :: header('公共设施')">
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>公共设施管理</h2>
+        <button sec:authorize="hasRole('ADMIN')" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFacilityModal">
+            <i class="bi bi-plus-lg"></i> 添加设施
+        </button>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>状态</th>
+                        <th>位置</th>
+                        <th>创建时间</th>
+                        <th sec:authorize="hasRole('ADMIN')">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="facility : ${facilities}">
+                        <td>
+                            <a th:href="@{/facilities/{id}(id=${facility.id})}" th:text="${facility.name}"></a>
+                        </td>
+                        <td>
+                                <span th:class="${facility.status == 'AVAILABLE'} ? 'badge bg-success' :
+                                             ${facility.status == 'MAINTENANCE'} ? 'badge bg-warning' : 'badge bg-danger'"
+                                      th:text="${facility.status}"></span>
+                        </td>
+                        <td th:text="${facility.location}"></td>
+                        <td th:text="${#temporals.format(facility.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td sec:authorize="hasRole('ADMIN')">
+                            <button class="btn btn-sm btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editFacilityModal"
+                                    th:attr="data-id=${facility.id},
+                                                 data-name=${facility.name},
+                                                 data-description=${facility.description},
+                                                 data-status=${facility.status},
+                                                 data-location=${facility.location}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger ms-2"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteFacilityModal"
+                                    th:attr="data-id=${facility.id}, data-name=${facility.name}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加设施模态框 -->
+<div sec:authorize="hasRole('ADMIN')" class="modal fade" id="addFacilityModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加公共设施</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/facilities}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">设施名称</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">描述</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="location" class="form-label">位置</label>
+                        <input type="text" class="form-control" id="location" name="location" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">状态</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="AVAILABLE">可用</option>
+                            <option value="MAINTENANCE">维护中</option>
+                            <option value="OUT_OF_SERVICE">停用</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑设施模态框 -->
+<div sec:authorize="hasRole('ADMIN')" class="modal fade" id="editFacilityModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑公共设施</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/facilities/{id}(id=__${facility.id}__)}" th:object="${facility}" method="post">
+                <input type="hidden" name="_method" value="put">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">设施名称</label>
+                        <input type="text" class="form-control" id="editName" name="name" th:value="*{name}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDescription" class="form-label">描述</label>
+                        <textarea class="form-control" id="editDescription" name="description" rows="3" th:text="*{description}"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editLocation" class="form-label">位置</label>
+                        <input type="text" class="form-control" id="editLocation" name="location" th:value="*{location}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editStatus" class="form-label">状态</label>
+                        <select class="form-select" id="editStatus" name="status" required>
+                            <option th:each="status : ${T(com.property.model.Facility).STATUSES}"
+                                    th:value="${status}"
+                                    th:text="${status}"
+                                    th:selected="${status == facility.status}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 删除设施模态框 -->
+<div sec:authorize="hasRole('ADMIN')" class="modal fade" id="deleteFacilityModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">删除公共设施</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除设施 <span id="facilityNameToDelete" class="fw-bold"></span> 吗？</p>
+                <p class="text-danger">此操作不可撤销！</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form th:action="@{/facilities/{id}(id=__${facility.id}__)}" method="post">
+                    <input type="hidden" name="_method" value="delete">
+                    <button type="submit" class="btn btn-danger">删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+<script th:src="@{/js/facility.js}"></script>
+</body>
+</html>

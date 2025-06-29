@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header('注册')">
+</head>
+<body class="bg-light">
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">用户注册</h2>
+                    <form th:action="@{/register}" method="post" id="registerForm">
+                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">用户名</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                                <div class="invalid-feedback">请输入用户名</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">密码</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="invalid-feedback">请输入密码</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">角色</label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="">请选择角色</option>
+                                <option value="RESIDENT">住户</option>
+                                <option value="ADMIN" th:if="${!hasAdmin}">管理员</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="residentSelect">
+                            <label for="residentId" class="form-label">关联住户</label>
+                            <select class="form-select" id="residentId" name="residentId">
+                                <option value="">不关联住户</option>
+                                <option th:each="resident : ${residents}"
+                                        th:value="${resident.id}"
+                                        th:text="${resident.name + ' (' + resident.roomNumber + ')'}"></option>
+                            </select>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">注册</button>
+                        </div>
+                    </form>
+                    <div class="mt-3 text-center">
+                        <a th:href="@{/login}">已有账号？立即登录</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="fragments/footer :: footer"></div>
+<script th:src="@{/js/register.js}"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/header :: header('仪表盘')">
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container-fluid">
+  <div class="row">
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">仪表盘</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">分享</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">导出</button>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+            <i class="bi bi-calendar"></i> 本周
+          </button>
+        </div>
+      </div>
+
+      <!-- 概览卡片 -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+              <h5 class="card-title">未支付费用</h5>
+              <p class="card-text display-6" th:text="${unpaidFeeCount}"></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+              <h5 class="card-title">已完成维修</h5>
+              <p class="card-text display-6" th:text="${completedRepairCount}"></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+              <h5 class="card-title">处理中维修</h5>
+              <p class="card-text display-6" th:text="${processingRepairCount}"></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+              <h5 class="card-title">可用设施</h5>
+              <p class="card-text display-6" th:text="${availableFacilityCount}"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 费用和维修图表 -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card shadow-sm mb-4">
+            <div class="card-body">
+              <h5 class="card-title">近期费用</h5>
+              <canvas id="feeChart" height="250"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card shadow-sm mb-4">
+            <div class="card-body">
+              <h5 class="card-title">维修状态</h5>
+              <canvas id="repairChart" height="250"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 最近活动和通知 -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">最近活动</h5>
+              <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">新的费用已添加</h6>
+                    <small>3天前</small>
+                  </div>
+                  <p class="mb-1">物业费 ¥500.00 到期日 2023-06-30</p>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">维修申请已处理</h6>
+                    <small>5天前</small>
+                  </div>
+                  <p class="mb-1">水管漏水问题已解决</p>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">系统通知</h5>
+              <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">系统维护通知</h6>
+                    <small>1周前</small>
+                  </div>
+                  <p class="mb-1">系统将于本周六凌晨2:00-4:00进行维护</p>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">新功能上线</h6>
+                    <small>2周前</small>
+                  </div>
+                  <p class="mb-1">在线支付功能现已上线，欢迎使用</p>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+<script th:src="@{/js/chart.min.js}"></script>
+<script th:src="@{/js/dashboard.js}"></script>
+</body>
+</html>

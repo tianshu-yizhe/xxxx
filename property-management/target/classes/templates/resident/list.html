@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/header :: header('住户管理')">
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>住户管理</h2>
+        <div>
+            <button sec:authorize="hasRole('ADMIN')" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addResidentModal">
+                <i class="bi bi-plus-lg"></i> 添加住户
+            </button>
+            <button class="btn btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#searchResidentModal">
+                <i class="bi bi-search"></i> 搜索
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>房间号</th>
+                        <th>电话</th>
+                        <th>身份证号</th>
+                        <th sec:authorize="hasRole('ADMIN')">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="resident : ${residents}">
+                        <td th:text="${resident.name}"></td>
+                        <td th:text="${resident.roomNumber}"></td>
+                        <td th:text="${resident.phone}"></td>
+                        <td>
+                            <span th:text="${#strings.substring(resident.identityNumber, 0, 4) + '********' + #strings.substring(resident.identityNumber, 12)}"></span>
+                        </td>
+                        <td sec:authorize="hasRole('ADMIN')">
+                            <button class="btn btn-sm btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editResidentModal"
+                                    th:attr="data-id=${resident.id},
+                                                 data-name=${resident.name},
+                                                 data-phone=${resident.phone},
+                                                 data-roomNumber=${resident.roomNumber},
+                                                 data-identityNumber=${resident.identityNumber}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger ms-2"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteResidentModal"
+                                    th:attr="data-id=${resident.id}, data-name=${resident.name}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加住户模态框 -->
+<div sec:authorize="hasRole('ADMIN')" class="modal fade" id="addResidentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加住户</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/residents}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">姓名</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">电话</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="roomNumber" class="form-label">房间号</label>
+                        <input type="text" class="form-control" id="roomNumber" name="roomNumber" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="identityNumber" class="form-label">身份证号</label>
+                        <input type="text" class="form-control" id="identityNumber" name="identityNumber" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑住户模态框 -->
+<div sec:authorize="hasRole('ADMIN')" class="modal fade" id="editResidentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑住户信息</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/residents/{id}(id=${resident.id})}" method="post">
+                <input type="hidden" name="_method" value="put">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">姓名</label>
+                        <input type="text" class="form-control" id="editName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPhone" class="form-label">电话</label>
+                        <input type="tel" class="form-control" id="editPhone" name="phone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRoomNumber" class="form-label">房间号</label>
+                        <input type="text" class="form-control" id="editRoomNumber" name="roomNumber" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editIdentityNumber" class="form-label">身份证号</label>
+                        <input type="text" class="form-control" id="editIdentityNumber" name="identityNumber" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 删除住户模态框 -->
+<div sec:authorize="hasRole('ADMIN')" class="modal fade" id="deleteResidentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">删除住户</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除住户 <span id="residentNameToDelete" class="fw-bold"></span> 吗？</p>
+                <p class="text-danger">此操作将同时删除关联的用户账号和费用记录！</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form th:action="@{/residents/{id}(id=${resident.id})}" method="post">
+                    <input type="hidden" name="_method" value="delete">
+                    <button type="submit" class="btn btn-danger">删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 搜索住户模态框 -->
+<div class="modal fade" id="searchResidentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">搜索住户</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/residents/search}" method="get">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="keyword" class="form-label">关键词</label>
+                        <input type="text" class="form-control" id="keyword" name="keyword" placeholder="姓名、房间号或电话">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">搜索</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+<script th:src="@{/js/resident.js}"></script>
+</body>
+</html>
